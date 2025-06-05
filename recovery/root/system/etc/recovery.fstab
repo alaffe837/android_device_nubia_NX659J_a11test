@@ -1,57 +1,65 @@
-# Copyright (c) 2018-2019 The Linux Foundation. All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted (subject to the limitations in the
-# disclaimer below) provided that the following conditions are met:
-#
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#
-#    * Redistributions in binary form must reproduce the above
-#      copyright notice, this list of conditions and the following
-#      disclaimer in the documentation and/or other materials provided
-#      with the distribution.
-#
-#    * Neither the name of The Linux Foundation nor the names of its
-#      contributors may be used to endorse or promote products derived
-#      from this software without specific prior written permission.
-#
-# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
-# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
-# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# Armazenamento removível
+/external_sd vfat /dev/block/mmcblk1p1 /dev/block/mmcblk1 flags=storage;wipeingui;removable
+/usb-otg auto /dev/block/sda1 /dev/block/sda flags=display="USB-OTG";storage;wipeingui;removable
 
-# Android fstab file.
-# The filesystem that contains the filesystem checker binary (typically /system) cannot
-# specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
-
-#<src>                                                 <mnt_point>            <type>  <mnt_flags and options>                            <fs_mgr_flags>
-system                                                  /system                ext4    ro,barrier=1,discard                                 wait,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-system_ext                                              /system_ext            ext4    ro,barrier=1,discard                                 wait,avb=vbmeta_system,logical,first_stage_mount
-product                                                 /product               ext4    ro,barrier=1,discard                                 wait,avb=vbmeta_system,logical,first_stage_mount
-vendor                                                  /vendor                ext4    ro,barrier=1,discard                                 wait,avb,logical,first_stage_mount
-odm                                                     /odm                   ext4    ro,barrier=1,discard                                 wait,avb,logical,first_stage_mount
-/dev/block/by-name/metadata                             /metadata              ext4    noatime,nosuid,nodev,discard                         wait,check,formattable,first_stage_mount
-#/dev/block/bootdevice/by-name/userdata                  /data                  f2fs    noatime,nosuid,nodev,discard,reserve_root=32768,resgid=1065,fsync_mode=nobarrier,inlinecrypt    latemount,wait,check,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,keydirectory=/metadata/vold/metadata_encryption,quota,reservedsize=128M,sysfs_path=/sys/devices/platform/soc/1d84000.ufshc,checkpoint=fs
-/dev/block/bootdevice/by-name/userdata                  /data                  f2fs    noatime,nosuid,nodev,discard,reserve_root=32768,resgid=1065,fsync_mode=nobarrier,inlinecrypt    latemount,wait,check,formattable,fileencryption=ice,wrappedkey,quota,reservedsize=128M,sysfs_path=/sys/devices/platform/soc/1d84000.ufshc,checkpoint=fs
-/dev/block/bootdevice/by-name/cache                     /cache                 ext4    nosuid,noatime,nodev,barrier=1                       wait
-/dev/block/bootdevice/by-name/persist                   /mnt/vendor/persist    ext4    noatime,nosuid,nodev,barrier=1                       wait
-/dev/block/bootdevice/by-name/boot                      /boot                  emmc    defaults                                             defaults
-/dev/block/bootdevice/by-name/recovery                  /recovery              emmc    defaults                                             defaults
-/dev/block/bootdevice/by-name/misc                      /misc                  emmc    defaults                                             defaults
-#/devices/platform/soc/8804000.sdhci/mmc_host*           /storage/sdcard1       vfat    nosuid,nodev                                         wait,voldmanaged=sdcard1:auto,encryptable=footer
-#/devices/platform/soc/1da4000.ufshc_card/host*          /storage/sdcard1       vfat    nosuid,nodev                                         wait,voldmanaged=sdcard1:auto,encryptable=footer
-/devices/platform/soc/*.ssusb/*.dwc3/xhci-hcd.*.auto*   /storage/usbotg        vfat    nosuid,nodev                                         wait,voldmanaged=usbotg:auto
-/dev/block/bootdevice/by-name/spunvm                    /mnt/vendor/spunvm     vfat    rw,noatime,shortname=lower,uid=1000,gid=1000,dmask=007,fmask=007,context=u:object_r:spunvm_file:s0 wait
-/dev/block/bootdevice/by-name/modem                     /vendor/firmware_mnt   vfat    ro,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337,context=u:object_r:firmware_file:s0 wait
-/dev/block/bootdevice/by-name/dsp                       /vendor/dsp            ext4    ro,nosuid,nodev,barrier=1                            wait
-/dev/block/bootdevice/by-name/bluetooth                 /vendor/bt_firmware    vfat    ro,shortname=lower,uid=1002,gid=3002,dmask=227,fmask=337,context=u:object_r:bt_firmware_file:s0 wait
+/system                   ext4     system                                           flags=display=system;logical;slotselect
+/system_ext               ext4     system_ext                                       flags=display=system_ext;logical;slotselect
+/vendor                   ext4     vendor                                           flags=display=vendor;logical;slotselect
+/product                  ext4     product                                          flags=display=product;logical;slotselect
+/vendor_dlkm              ext4     vendor_dlkm                                      flags=display=vendor_dlkm;logical;slotselect
+/odm_dlkm                 ext4     odm_dlkm                                         flags=display=odm_dlkm;logical;slotselect
+/metadata                 ext4     /dev/block/by-name/metadata                      flags=display=metadata
+/data                     f2fs     /dev/block/by-name/userdata                      flags=display=data
+/mnt/vendor/protect_f     ext4     /dev/block/by-name/protect1                      flags=display=protect_f
+/mnt/vendor/protect_s     ext4     /dev/block/by-name/protect2                      flags=display=protect_s
+/mnt/vendor/nvdata        ext4     /dev/block/by-name/nvdata                        flags=display=nvdata
+/mnt/vendor/nvcfg         ext4     /dev/block/by-name/nvcfg                         flags=display=nvcfg
+/mnt/vendor/persist       ext4     /dev/block/by-name/persist                       flags=display=persist
+auto                      auto     /devices/platform/soc/11240000.mmc*              flags=display=auto
+auto                      auto     /devices/platform/soc/soc:odm/11230000.msdc*     flags=display=auto
+auto                      vfat     /devices/platform/soc/mt_usb*                    flags=display=auto
+/persistent               emmc     /dev/block/by-name/frp                           flags=display=persistent
+/nvram                    emmc     /dev/block/by-name/nvram                         flags=display=nvram
+/proinfo                  emmc     /dev/block/by-name/proinfo                       flags=display=proinfo
+/lk1                      emmc     /dev/block/by-name/lk1                           flags=display=lk1
+/bootloader2              emmc     /dev/block/by-name/bootloader2                   flags=display=bootloader2
+/para                     emmc     /dev/block/by-name/para                          flags=display=para
+/misc                     emmc     /dev/block/by-name/misc                          flags=display=misc
+/boot                     emmc     /dev/block/by-name/boot                          flags=display=boot;slotselect
+/vbmeta_vendor            emmc     /dev/block/by-name/vbmeta_vendor                 flags=display=vbmeta_vendor;slotselect
+/vbmeta_system            emmc     /dev/block/by-name/vbmeta_system                 flags=display=vbmeta_system;slotselect
+/logo                     emmc     /dev/block/by-name/logo                          flags=display=logo
+/expdb                    emmc     /dev/block/by-name/expdb                         flags=display=expdb
+/seccfg                   emmc     /dev/block/by-name/seccfg                        flags=display=seccfg
+/tee1                     emmc     /dev/block/by-name/tee1                          flags=display=tee1
+/tee2                     emmc     /dev/block/by-name/tee2                          flags=display=tee2
+/scp1                     emmc     /dev/block/by-name/scp1                          flags=display=scp1
+/scp2                     emmc     /dev/block/by-name/scp2                          flags=display=scp2
+/sspm1                    emmc     /dev/block/by-name/sspm1                         flags=display=sspm1
+/sspm2                    emmc     /dev/block/by-name/sspm2                         flags=display=sspm2
+/dpm1                     emmc     /dev/block/by-name/dpm1                          flags=display=dpm1
+/dpm2                     emmc     /dev/block/by-name/dpm2                          flags=display=dpm2
+/mcupm1                   emmc     /dev/block/by-name/mcupm1                        flags=display=mcupm1
+/mcupm2                   emmc     /dev/block/by-name/mcupm2                        flags=display=mcupm2
+/md1img                   emmc     /dev/block/by-name/md1img                        flags=display=md1img
+/md1dsp                   emmc     /dev/block/by-name/md1dsp                        flags=display=md1dsp
+/md1arm7                  emmc     /dev/block/by-name/md1arm7                       flags=display=md1arm7
+/md3img                   emmc     /dev/block/by-name/md3img                        flags=display=md3img
+/gz1                      emmc     /dev/block/by-name/gz1                           flags=display=gz1
+/gz2                      emmc     /dev/block/by-name/gz2                           flags=display=gz2
+/ccu                      emmc     /dev/block/by-name/ccu                           flags=display=ccu
+/vcp                      emmc     /dev/block/by-name/vcp                           flags=display=vcp
+/gpueb                    emmc     /dev/block/by-name/gpueb                         flags=display=gpueb
+/mcf_ota                  emmc     /dev/block/by-name/mcf_ota                       flags=display=mcf_ota
+/vendor_boot              emmc     /dev/block/by-name/vendor_boot                   flags=display=vendor_boot
+/mvpu_algo1               emmc     /dev/block/by-name/mvpu_algo1                    flags=display=mvpu_algo1
+/mvpu_algo2               emmc     /dev/block/by-name/mvpu_algo2                    flags=display=mvpu_algo2
+/apusys1                  emmc     /dev/block/by-name/apusys1                       flags=display=apusys1
+/apusys2                  emmc     /dev/block/by-name/apusys2                       flags=display=apusys2
+/spmfw                    emmc     /dev/block/by-name/spmfw                         flags=display=spmfw
+/pi_img                   emmc     /dev/block/by-name/pi_img                        flags=display=pi_img
+/boot_para                emmc     /dev/block/by-name/boot_para                     flags=display=boot_para
+/odmdtbo                  emmc     /dev/block/by-name/odmdtbo                       flags=display=odmdtbo
+/dtbo                     emmc     /dev/block/by-name/dtbo                          flags=display=dtbo
+/otp                      emmc     /dev/block/by-name/otp                           flags=display=otp
+/vbmeta                   emmc     /dev/block/by-name/vbmeta                        flags=display=vbmeta
